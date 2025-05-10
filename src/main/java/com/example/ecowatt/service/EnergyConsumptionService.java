@@ -1,12 +1,14 @@
 package com.example.ecowatt.service;
 
 import com.example.ecowatt.dto.EnergyConsumptionDto;
+import com.example.ecowatt.dto.EnergyExhibitionDto;
 import com.example.ecowatt.model.EnergyConsumption;
 import com.example.ecowatt.repository.EnergyConsumptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service layer for handling business logic related to energy consumption records.
@@ -21,25 +23,27 @@ public class EnergyConsumptionService {
      * Saves a new energy consumption record to the database.
      *
      * @param dto the data transfer object containing the consumption info
-     * @return the saved EnergyConsumption entity
+     * @return the saved EnergyExhibitionDto with stored data
      */
-    public EnergyConsumption save(EnergyConsumptionDto dto) {
+    public EnergyExhibitionDto save(EnergyConsumptionDto dto) {
         EnergyConsumption consumption = new EnergyConsumption(
                 dto.device(),
                 dto.consumptionWatts(),
                 dto.timestamp()
         );
-        return repository.save(consumption);
+        return toDto(repository.save(consumption));
     }
-
 
     /**
      * Retrieves all energy consumption records.
      *
-     * @return list of all EnergyConsumption entities
+     * @return list of all EnergyExhibitionDto objects
      */
-    public List<EnergyConsumption> findAll() {
-        return repository.findAll();
+    public List<EnergyExhibitionDto> findAll() {
+        return repository.findAll()
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -47,10 +51,10 @@ public class EnergyConsumptionService {
      *
      * @param id  the ID of the record to update
      * @param dto the new values for the record
-     * @return the updated EnergyConsumption entity
+     * @return the updated EnergyExhibitionDto
      * @throws RuntimeException if the record is not found
      */
-    public EnergyConsumption update(Long id, EnergyConsumptionDto dto) {
+    public EnergyExhibitionDto update(Long id, EnergyConsumptionDto dto) {
         EnergyConsumption existing = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Energy consumption not found with id " + id));
 
@@ -58,7 +62,7 @@ public class EnergyConsumptionService {
         existing.setConsumptionWatts(dto.consumptionWatts());
         existing.setTimestamp(dto.timestamp());
 
-        return repository.save(existing);
+        return toDto(repository.save(existing));
     }
 
     /**
@@ -74,5 +78,18 @@ public class EnergyConsumptionService {
         repository.deleteById(id);
     }
 
-
+    /**
+     * Converts an EnergyConsumption entity to EnergyExhibitionDto.
+     *
+     * @param entity the EnergyConsumption entity
+     * @return the converted EnergyExhibitionDto
+     */
+    private EnergyExhibitionDto toDto(EnergyConsumption entity) {
+        return new EnergyExhibitionDto(
+                entity.getId(),
+                entity.getDevice(),
+                entity.getConsumptionWatts(),
+                entity.getTimestamp()
+        );
+    }
 }
