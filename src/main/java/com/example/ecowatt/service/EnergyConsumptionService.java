@@ -25,12 +25,13 @@ public class EnergyConsumptionService {
      */
     public EnergyConsumption save(EnergyConsumptionDto dto) {
         EnergyConsumption consumption = new EnergyConsumption(
-                dto.getDevice(),
-                dto.getConsumptionWatts(),
-                dto.getTimestamp()
+                dto.device(),
+                dto.consumptionWatts(),
+                dto.timestamp()
         );
         return repository.save(consumption);
     }
+
 
     /**
      * Retrieves all energy consumption records.
@@ -39,5 +40,24 @@ public class EnergyConsumptionService {
      */
     public List<EnergyConsumption> findAll() {
         return repository.findAll();
+    }
+
+    /**
+     * Updates an existing energy consumption record by ID.
+     *
+     * @param id  the ID of the record to update
+     * @param dto the new values for the record
+     * @return the updated EnergyConsumption entity
+     * @throws RuntimeException if the record is not found
+     */
+    public EnergyConsumption update(Long id, EnergyConsumptionDto dto) {
+        EnergyConsumption existing = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Energy consumption not found with id " + id));
+
+        existing.setDevice(dto.device());
+        existing.setConsumptionWatts(dto.consumptionWatts());
+        existing.setTimestamp(dto.timestamp());
+
+        return repository.save(existing);
     }
 }

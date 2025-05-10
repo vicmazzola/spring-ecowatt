@@ -42,4 +42,19 @@ public class EnergyConsumptionController {
     public List<EnergyConsumption> findAll() {
         return service.findAll();
     }
+
+    /**
+     * Updates an existing energy consumption record by ID.
+     *
+     * @param id  the ID of the record to update
+     * @param dto the updated energy consumption data
+     * @return the updated entity
+     */
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public EnergyConsumption update(@PathVariable Long id, @RequestBody @Valid EnergyConsumptionDto dto) {
+        return service.update(id, dto);
+    }
+
+
 }
