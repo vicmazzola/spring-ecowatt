@@ -60,4 +60,19 @@ public class EnergyConsumptionService {
 
         return repository.save(existing);
     }
+
+    /**
+     * Deletes an energy consumption record by ID.
+     *
+     * @param id the ID of the record to delete
+     * @throws RuntimeException if the record is not found
+     */
+    public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("Energy consumption not found with id " + id);
+        }
+        repository.deleteById(id);
+    }
+
+
 }
