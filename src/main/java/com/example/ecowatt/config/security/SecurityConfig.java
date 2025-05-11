@@ -12,6 +12,10 @@ import org.springframework.security.web.SecurityFilterChain;
  * Configuration class for Spring Security.
  *
  * <p>Defines basic HTTP security settings for the Ecowatt application.</p>
+ * <ul>
+ *     <li>Requires authentication for POST, PUT, and DELETE requests to <code>/api/energy</code>.</li>
+ *     <li>Allows GET and other requests without authentication.</li>
+ * </ul>
  */
 @Configuration
 @EnableWebSecurity
@@ -19,12 +23,6 @@ public class SecurityConfig {
 
     /**
      * Configures the security filter chain for the application.
-     *
-     * <p>Disables CSRF protection, sets stateless session policy, and enables basic authentication.</p>
-     * <ul>
-     *     <li>Allows all POST requests to <code>/energy</code> only for authenticated users.</li>
-     *     <li>All other requests are permitted.</li>
-     * </ul>
      *
      * @param httpSecurity the {@link HttpSecurity} to configure
      * @return the configured {@link SecurityFilterChain}
@@ -36,10 +34,14 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/energy").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/energy").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/energy/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/energy/**").authenticated()
                         .anyRequest().permitAll()
                 )
-                .httpBasic(http -> {})
+                .httpBasic(http -> {
+                })
                 .build();
     }
 }
+
